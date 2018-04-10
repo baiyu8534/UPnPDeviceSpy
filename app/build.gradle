@@ -19,10 +19,26 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation files('libs/cling-core-2.1.0.jar')
+    implementation files('libs/cling-support-2.0.1.jar')
+    implementation files('libs/jetty-client-8.1.12.v20130726.jar')
+    implementation files('libs/jetty-continuation-8.1.12.v20130726.jar')
+    implementation files('libs/jetty-http-8.1.12.v20130726.jar')
+    implementation files('libs/jetty-io-8.1.12.v20130726.jar')
+    implementation files('libs/jetty-security-8.1.12.v20130726.jar')
+    implementation files('libs/jetty-server-8.1.12.v20130726.jar')
+    implementation files('libs/jetty-servlet-8.1.12.v20130726.jar')
+    implementation files('libs/jetty-util-8.1.12.v20130726.jar')
+    implementation files('libs/seamless-http-1.1.0.jar')
+    implementation files('libs/seamless-util-1.1.0.jar')
+    implementation files('libs/seamless-xml-1.1.0.jar')
+    implementation files('libs/servlet-api-3.0.jar')
+    implementation files('libs/slf4j-jdk14-1.7.5.jar')
+    implementation 'com.android.support:recyclerview-v7:26+'
 }
