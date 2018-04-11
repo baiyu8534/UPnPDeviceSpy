@@ -8,7 +8,7 @@ package com.example.baiyu.upnpdevicespy.bean;
  * 版权：
  */
 
-public class DeviceRvItemBean {
+public class DeviceSimpleDetailBean {
     private String name;
     private String URN;
     private String ip;

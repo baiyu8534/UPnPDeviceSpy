@@ -41,4 +41,9 @@ dependencies {
     implementation files('libs/servlet-api-3.0.jar')
     implementation files('libs/slf4j-jdk14-1.7.5.jar')
     implementation 'com.android.support:recyclerview-v7:26+'
+
+    compile 'com.jakewharton:butterknife:8.7.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
+
+    compile 'com.android.support:design:26+'
 }

@@ -1,6 +1,7 @@
 package com.example.baiyu.upnpdevicespy.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.baiyu.upnpdevicespy.R;
-import com.example.baiyu.upnpdevicespy.bean.DeviceRvItemBean;
+import com.example.baiyu.upnpdevicespy.activity.DeviceDetailActivity;
+import com.example.baiyu.upnpdevicespy.bean.DeviceSimpleDetailBean;
 
 import java.util.List;
 
@@ -23,9 +25,9 @@ import java.util.List;
 public class MainRvAdapter extends RecyclerView.Adapter<MainRvAdapter.ViewHolder> {
 
     private Context mContext;
-    private List<DeviceRvItemBean> mList;
+    private List<DeviceSimpleDetailBean> mList;
 
-    public MainRvAdapter(Context context, List<DeviceRvItemBean> list) {
+    public MainRvAdapter(Context context, List<DeviceSimpleDetailBean> list) {
         mContext = context;
         mList = list;
     }
@@ -37,14 +39,16 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.tv_device_name.setText(mList.get(position).getName());
         holder.tv_device_ip.setText(mList.get(position).getDeviceType() + ":" + mList.get(position).getIp());
         holder.tv_device_urn.setText(mList.get(position).getURN());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mContext.startActivity();
+                Intent intent = new Intent(mContext, DeviceDetailActivity.class);
+                intent.putExtra("device uuid", mList.get(position).getUuid());
+                mContext.startActivity(intent);
             }
         });
     }

@@ -18,6 +18,8 @@ public class MyApplication extends Application {
     private static MyApplication myApplication;
     private static int mainTid;
 
+    private BaseActivity currentActivity;//当前活动的页面
+
     /**
      * 当前网络为wifi
      */
@@ -40,7 +42,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        if(myApplication == null) {
+        if (myApplication == null) {
             myApplication = MyApplication.this;
         }
         activitys = new LinkedList<>();
@@ -113,5 +115,13 @@ public class MyApplication extends Application {
 
         finishAllActivity();
         System.exit(0);
+    }
+
+    public BaseActivity getCurrentActivity() {
+        return currentActivity;
+    }
+
+    public void setCurrentActivity(BaseActivity currentActivity) {
+        this.currentActivity = currentActivity;
     }
 }
