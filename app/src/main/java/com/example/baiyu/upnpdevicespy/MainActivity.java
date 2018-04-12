@@ -20,6 +20,7 @@ import com.example.baiyu.upnpdevicespy.upnp_core.UpnpManager;
 import com.example.baiyu.upnpdevicespy.upnp_core.UpnpService;
 import com.example.baiyu.upnpdevicespy.utils.SnackbarUtil;
 
+import org.fourthline.cling.android.FixedAndroidLogHandler;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.RemoteDevice;
@@ -67,6 +68,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Fix the logging integration between java.util.logging and Android internal logging
+        org.seamless.util.logging.LoggingUtil.resetRootHandler(
+                new FixedAndroidLogHandler()
+        );
+        // Now you can enable logging as needed for various categories of Cling:
+        // Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
+
         setContentView(R.layout.activity_main);
         mHandler = new MyHandler(this);
         initView();
