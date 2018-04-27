@@ -5,11 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,14 +20,21 @@ import com.example.baiyu.upnpdevicespy.BaseActivity;
 import com.example.baiyu.upnpdevicespy.R;
 import com.example.baiyu.upnpdevicespy.bean.DeviceSimpleDetailBean;
 import com.example.baiyu.upnpdevicespy.upnp_core.UpnpManager;
+import com.example.baiyu.upnpdevicespy.upnp_core.UpnpOrderManager;
 import com.example.baiyu.upnpdevicespy.utils.SnackbarUtil;
 
+import org.fourthline.cling.model.action.ActionArgumentValue;
+import org.fourthline.cling.model.action.ActionInvocation;
+import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Action;
+import org.fourthline.cling.model.meta.ActionArgument;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.model.types.UDN;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -84,7 +93,7 @@ public class DeviceDetailActivity extends BaseActivity {
 
     }
 
-    private void showdata(Device device) {
+    private void showdata(final Device device) {
         mTvBaseUrl.setText(device.getDetails().getBaseURL() == null ? "" : device.getDetails().getBaseURL().toString());
         mTvDeviceIcon.setText(Arrays.asList(device.getIcons()).toString());
         mTvDeviceUrn.setText(device.getType().getNamespace() + ":" + device.getType().getType() + ":" + device
@@ -102,22 +111,118 @@ public class DeviceDetailActivity extends BaseActivity {
             View serviceView = LayoutInflater.from(mContext).inflate(R.layout.item_service, null);
             TextView tv_service_name = serviceView.findViewById(R.id.tv_service_name);
             final LinearLayout ll_hid = serviceView.findViewById(R.id.ll_hid);
+            final LinearLayout ll_show_or_hid = serviceView.findViewById(R.id.ll_show_or_hid);
             final ImageView iv_show_or_hid = serviceView.findViewById(R.id.iv_show_or_hid);
 
             //在测量高度之前去添加
-            for (Action action : Arrays.asList(service.getActions())) {
+            for (final Action action : Arrays.asList(service.getActions())) {
                 View actionView = LayoutInflater.from(mContext).inflate(R.layout.item_action, null);
                 TextView tv_action_name = actionView.findViewById(R.id.tv_action_name);
                 tv_action_name.setText(action.getName());
                 ll_hid.addView(actionView);
+                actionView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        View action_dialog = LayoutInflater.from(mContext).inflate(R.layout.action_dialog, null);
+                        LinearLayout ll_content = action_dialog.findViewById(R.id.ll_content);
+                        final TextView tv_result = action_dialog.findViewById(R.id.tv_result);
+
+
+                        List<ActionArgument> actionArguments = Arrays.asList(action.getArguments());
+                        final List<EditText> arg_in_edittexts = new ArrayList<>();
+                        final List<TextView> arg_out_textviews = new ArrayList<>();
+                        for (ActionArgument actionArgument : actionArguments) {
+                            System.out.println(actionArgument.getAliases().toString());
+                            System.out.println(actionArgument.getDatatype().getDisplayString());
+                            System.out.println(actionArgument.getRelatedStateVariableName());
+                            System.out.println(actionArgument.getName());
+                            System.out.println(actionArgument.getDatatype().getDisplayString());
+                            System.out.println(actionArgument.getDirection().name());
+
+                            if ("OUT".equals(actionArgument.getDirection().name())) {
+                                //是get的方法 获取信息 有返回值的方法
+
+                                View item_action_arguments = LayoutInflater.from(mContext).inflate(R.layout.item_action_arguments_out, null);
+                                TextView tv_arg_name = item_action_arguments.findViewById(R.id.tv_arg_name);
+                                TextView et_arg_out = item_action_arguments.findViewById(R.id.et_arg_out);
+                                tv_arg_name.setText(actionArgument.getName());
+                                et_arg_out.setTag(actionArgument.getName());
+                                arg_out_textviews.add(et_arg_out);
+                                ll_content.addView(item_action_arguments);
+                            } else if ("IN".equals(actionArgument.getDirection().name())) {
+                                //是set方法 设置方法 传入参数的方法
+
+                                View item_action_arguments = LayoutInflater.from(mContext).inflate(R.layout.item_action_arguments_in, null);
+                                TextView tv_arg_name = item_action_arguments.findViewById(R.id.tv_arg_name);
+                                EditText et_arg_in = item_action_arguments.findViewById(R.id.et_arg_in);
+                                tv_arg_name.setText(actionArgument.getName());
+                                arg_in_edittexts.add(et_arg_in);
+                                ll_content.addView(item_action_arguments);
+                            }
+                        }
+
+                        AlertDialog dialog = new AlertDialog.Builder(DeviceDetailActivity.this).setTitle("action:" + action.getName())
+                                .setView(action_dialog)
+                                .setPositiveButton("发送", null)
+                                .setNegativeButton("取消", null)
+                                .create();
+                        dialog.show();
+
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                List<Object> args = new ArrayList<>();
+                                for (EditText arg_edittext : arg_in_edittexts) {
+                                    args.add(arg_edittext.getText().toString());
+                                }
+                                UpnpOrderManager.sendOrder(
+                                        UpnpManager.getInstance().getControlPoint()
+                                        , action, args,
+                                        new UpnpOrderManager.ResultCallBacks() {
+                                            @Override
+                                            public void success(ActionInvocation invocation, String uid) {
+
+                                                for (ActionArgumentValue argumentValue : invocation.getOutput()) {
+                                                    System.out.println("argumentValue.getValue()::" + argumentValue.getValue());
+                                                    System.out.println("argumentValue.getArgument().getName()::" + argumentValue.getArgument().getName());
+                                                }
+
+                                                final ActionArgumentValue[] argumentValues = invocation.getOutput();
+                                                // 必须放到ui线程去，要不更新不了ui
+                                                DeviceDetailActivity.this.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        for (int i = 0; i < argumentValues.length; i++) {
+                                                            for (TextView textView : arg_out_textviews) {
+                                                                if ((textView.getTag()).equals(argumentValues[i].getArgument().getName())) {
+                                                                    textView.setText(argumentValues[i].getValue().toString());
+                                                                }
+                                                            }
+                                                        }
+                                                        tv_result.setText("成功");
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                                                tv_result.setText("失败");
+                                            }
+                                        });
+                            }
+                        });
+
+                    }
+                });
             }
 
+            // 高度
             final int hidLinearLayoutHeight;
             ll_hid.measure(0, 0);
             hidLinearLayoutHeight = ll_hid.getMeasuredHeight();
-            System.out.println("hidLinearLayoutHeight:" + hidLinearLayoutHeight);
 
-            iv_show_or_hid.setOnClickListener(new View.OnClickListener() {
+            ll_show_or_hid.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (ll_hid.getVisibility() == View.GONE) {
