@@ -196,7 +196,11 @@ public class DeviceDetailActivity extends BaseActivity {
                                                         for (int i = 0; i < argumentValues.length; i++) {
                                                             for (TextView textView : arg_out_textviews) {
                                                                 if ((textView.getTag()).equals(argumentValues[i].getArgument().getName())) {
-                                                                    textView.setText(argumentValues[i].getValue().toString());
+                                                                    if (argumentValues[i].getValue() != null) {
+                                                                        textView.setText(argumentValues[i].getValue().toString());
+                                                                    } else {
+                                                                        textView.setText("null");
+                                                                    }
                                                                 }
                                                             }
                                                         }
