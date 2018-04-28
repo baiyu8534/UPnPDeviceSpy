@@ -30,6 +30,7 @@ import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.ActionArgument;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
+import org.fourthline.cling.model.types.Datatype;
 import org.fourthline.cling.model.types.UDN;
 
 import java.util.ArrayList;
@@ -138,7 +139,19 @@ public class DeviceDetailActivity extends BaseActivity {
                             System.out.println(actionArgument.getRelatedStateVariableName());
                             System.out.println(actionArgument.getName());
                             System.out.println(actionArgument.getDatatype().getDisplayString());
+                            System.out.println(actionArgument.getDatatype().getBuiltin().getDescriptorName());
                             System.out.println(actionArgument.getDirection().name());
+                            System.out.println(actionArgument.getDirection().name());
+
+
+                            String java_type = "unknow";
+                            for (Datatype.Default aDefault : Datatype.Default.values()) {
+                                if (aDefault.getBuiltinType().getDescriptorName().equals(actionArgument.getDatatype().getBuiltin().getDescriptorName())) {
+                                    System.out.println(aDefault.getJavaType().toString());
+                                    java_type = aDefault.getJavaType().toString();
+                                }
+                            }
+
 
                             if ("OUT".equals(actionArgument.getDirection().name())) {
                                 //是get的方法 获取信息 有返回值的方法
@@ -146,18 +159,19 @@ public class DeviceDetailActivity extends BaseActivity {
                                 View item_action_arguments = LayoutInflater.from(mContext).inflate(R.layout.item_action_arguments_out, null);
                                 TextView tv_arg_name = item_action_arguments.findViewById(R.id.tv_arg_name);
                                 TextView et_arg_out = item_action_arguments.findViewById(R.id.et_arg_out);
-                                tv_arg_name.setText(actionArgument.getName());
+                                String arg_name = actionArgument.getName() + "(" + java_type + ")";
+                                tv_arg_name.setText(arg_name);
                                 et_arg_out.setTag(actionArgument.getName());
                                 arg_out_textviews.add(et_arg_out);
                                 ll_content.addView(item_action_arguments);
                             } else if ("IN".equals(actionArgument.getDirection().name())) {
                                 //是set方法 设置方法 传入参数的方法
-                                // FIXME: 2018/4/28 传参没问题，但是要判断参数类型，否则会奔溃
                                 // FIXME: 2018/4/28 还有要研究下upnp的设备的方法，那个类中的注解到底怎么用，要看下源代码
                                 View item_action_arguments = LayoutInflater.from(mContext).inflate(R.layout.item_action_arguments_in, null);
                                 TextView tv_arg_name = item_action_arguments.findViewById(R.id.tv_arg_name);
                                 EditText et_arg_in = item_action_arguments.findViewById(R.id.et_arg_in);
-                                tv_arg_name.setText(actionArgument.getName());
+                                String arg_name = actionArgument.getName() + "(" + java_type + ")";
+                                tv_arg_name.setText(arg_name);
                                 arg_in_edittexts.add(et_arg_in);
                                 ll_content.addView(item_action_arguments);
                             }

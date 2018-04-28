@@ -28,6 +28,7 @@ public class UpnpOrderManager {
         }
         controlPoint
                 .execute(new ActionCallback(actionInvocation, controlPoint) {
+                    // 不是线程安全的，不是在主线程中，修改ui要回主线程
                     @Override
                     public void success(ActionInvocation invocation) {
                         if (resultCallBacks != null)
