@@ -24,6 +24,7 @@ import org.fourthline.cling.android.FixedAndroidLogHandler;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.RemoteDevice;
+import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.registry.RegistryListener;
 
@@ -113,6 +114,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onDestroy();
         unbindService(conn);
     }
+
+    private DefaultRegistryListener mDefaultRegistryListener = new DefaultRegistryListener(){
+        //这个你可以只复写你需要的方法即可
+    };
 
     private RegistryListener mRegistryListener = new RegistryListener() {
         @Override
