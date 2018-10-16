@@ -148,7 +148,7 @@ public class DeviceDetailActivity extends BaseActivity {
                             for (Datatype.Default aDefault : Datatype.Default.values()) {
                                 if (aDefault.getBuiltinType().getDescriptorName().equals(actionArgument.getDatatype().getBuiltin().getDescriptorName())) {
                                     System.out.println(aDefault.getJavaType().toString());
-                                    java_type = aDefault.getJavaType().toString();
+                                    java_type = aDefault.getJavaType().toString().split("\\.")[aDefault.getJavaType().toString().split("\\.").length - 1];
                                 }
                             }
 
